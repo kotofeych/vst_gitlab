@@ -1,0 +1,29 @@
+---
+allow_duplicates: true
+dependencies:
+  - role: geerlingguy.gitlab
+    vars:
+      gitlab_config_template: "{{ vst_gitlab_config_template | default('gitlab-vst.rb.j2') }}"
+      gitlab_protocol_host: '{{ "https://" if (letsencrypt_enable is not defined or letsencrypt_enable) else "http://" }}'
+      gitlab_name_host: "{{ vst_gitlab_name_host | default('mydomen.ru') }}"
+      gitlab_create_self_signed_cert: "false"
+
+galaxy_info:
+  author: kotofeych
+  description: GitLab.rb Git web interface
+  company: "VST Consulting"
+  license: "license (BSD, MIT)"
+  min_ansible_version: 2.0
+  platforms:
+    - name: EL
+    - name: Debian
+    - name: Ubuntu
+  galaxy_tags:
+    - development
+    - web
+    - gitlab
+    - git
+    - repository
+    - ci
+    - integration
+
