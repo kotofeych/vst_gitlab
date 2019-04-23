@@ -4,7 +4,8 @@
  
 external_url "{{ gitlab_protocol_host }}git.{{ gitlab_name_host }}/"
 gitlab_rails['time_zone'] = "{{ vst_gitlab_time_zone | default('Asia/Vladivostok') }}"
-gitlab_rails['gitlab_default_theme'] = {{ gitlab_default_theme | default('2') }}
+gitlab_rails['gitlab_default_theme'] = {{ gitlab_default_theme }}
+git_data_dirs({"default" => {"path" => "{{ gitlab_git_data_dir }}"} })
 
 ###################
 # PROJECTS FEATURES
@@ -19,9 +20,9 @@ gitlab_rails['gitlab_issue_closing_pattern'] = "{{ gitlab_rails_gitlab_issue_clo
 
 ###########
 # ARTIFACTS
-###########
+###########     
 gitlab_rails['artifacts_enabled'] = {{ gitlab_rails_artifacts_enabled  | default('true') }}
-{% if ( gitlab_rails_artifacts_enabled is not defined or gitlab_rails_artifacts_enabled ) %}
+{% if ( gitlab_rails_artifacts_enabled is not defined or gitlab_rails_artifacts_enabled=='true') %}
 gitlab_rails['artifacts_path'] = "{{ gitlab_rails_artifacts_path | default('/var/opt/gitlab/gitlab-rails/shared/artifacts') }}"
 {% endif %}
 
@@ -34,20 +35,26 @@ gitlab_rails['lfs_enabled'] = {{ gitlab_rails_lfs_enabled | default('true') }}
 # NGINX
 ####### 
 nginx['enable'] = {{ nginx_enable | default('true') }}
-{% if ( nginx_enable is not defined or nginx_enable ) %}
+{% if ( nginx_enable is not defined or nginx_enable=='true' ) %}
 nginx['dir'] = "{{ nginx_dir | default('/var/opt/gitlab/nginx') }}"
 nginx['log_directory'] = "{{ nginx_log_directory | default('/var/log/gitlab/nginx') }}" 
 nginx['gzip'] = "{{ nginx_gzip | default('on') }}"
 nginx['worker_processes'] = {{ nginx_worker_processes | default('4') }}
 nginx['cache_max_size'] = "{{ nginx_cache_max_size | default('5000m') }}"
+{% if gitlab_nginx_listen_port is defined %}
+nginx['listen_port'] = "{{ gitlab_nginx_listen_port }}"
+{% endif %}
+{% if gitlab_nginx_listen_https is defined %}
+nginx['listen_https'] = {{ gitlab_nginx_listen_https }}
+{% endif %}
 {% endif %}
 
 ############
 # LETSECRYPT
 ############
 letsencrypt['enable'] = {{ letsencrypt_enable | default('true') }}
-{% if letsencrypt_enable is not defined or letsencrypt_enable %}
-letsencrypt['contact_emails'] = ['{{ letsencrypt_contact_emails | default('example@gmail.com') }}'] 
+{% if (letsencrypt_enable is not defined or letsencrypt_enable=='true' or letsencrypt_enable) %}
+letsencrypt['contact_emails'] = ['{{ letsencrypt_contact_email | default('example@gmail.com') }}'] 
 letsencrypt['auto_renew'] = {{ letsencrypt_auto_renew | default('true') }}
 {% endif %}
 
@@ -62,46 +69,45 @@ gitlab_rails['backup_upload_connection'] = {
     'aws_secret_access_key' =>  '{{ gitlab_rails_backup_upload_connection_aws_secret_access_key }}',
     'endpoint' =>  '{{ gitlab_rails_backup_upload_connection_endpoint }}'
     }
-{% else %}
-gitlab_rails['backup_path'] = "{{ gitlab_rails_backup_path | default('/var/opt/gitlab/backups') }}"
 {% endif %}
 gitlab_rails['backup_archive_permissions'] = {{ gitlab_rails_backup_archive_permissions | default('0644') }}
-gitlab_rails['backup_upload_remote_directory'] = '{{ gitlab_rails_backup_upload_remote_directory | default('gitlab-backups-vst-consulting') }}'
+gitlab_rails['backup_upload_remote_directory'] = '{{ gitlab_rails_backup_upload_remote_directory | default('gitlab-backups') }}'
 gitlab_rails['backup_storage_class'] = '{{ gitlab_rails_backup_storage_class | default('STANDARD') }}'
-gitlab_rails['backup_keep_time'] = {{ gitlab_backup_keep_time | default('604800') }}
+gitlab_rails['backup_keep_time'] = {{ gitlab_backup_keep_time }}
 
 ########
 # E-mail
 ########
-gitlab_rails['gitlab_email_enabled'] = {{ gitlab_email_enabled | default('true') }}
-{% if ( gitlab_email_enabled is not defined or gitlab_email_enabled ) %}
+gitlab_rails['gitlab_email_enabled'] = {{ gitlab_email_enabled }}
+{% if ( gitlab_email_enabled is not defined or gitlab_email_enabled=='true') %}
 gitlab_rails['gitlab_email_from'] = "{{ gitlab_email_from | default('office@example.com') }}"
-gitlab_rails['gitlab_email_display_name'] = "{{ gitlab_email_display_name | default('Gitlab') }}"
-gitlab_rails['gitlab_email_reply_to'] = "{{ gitlab_email_reply_to | default('noreply@example.com') }}"
+gitlab_rails['gitlab_email_display_name'] = "{{ gitlab_email_display_name }}"
+gitlab_rails['gitlab_email_reply_to'] = "{{ gitlab_email_reply_to }}"
 {% endif %}
 
 #######
 # SMTP
 #######  
-gitlab_rails['smtp_enable'] = {{ gitlab_smtp_enable | default('true') }}
-{% if ( gitlab_smtp_enable is not defined or gitlab_smtp_enable ) %}
-gitlab_rails['smtp_address'] = "{{ gitlab_smtp_address | default('smtp.service.com') }}"
-gitlab_rails['smtp_port'] = {{ gitlab_smtp_port | default('465') }}
-gitlab_rails['smtp_user_name'] = "{{ gitlab_smtp_user_name | default('email@example.com') }}"
-gitlab_rails['smtp_password'] = "{{ gitlab_smtp_password | default('password') }}"
-gitlab_rails['smtp_domain'] = "{{ gitlab_smtp_domain | default('example.com') }}"
-gitlab_rails['smtp_authentication'] = "{{ gitlab_smtp_authentication | default('password') }}"
-gitlab_rails['smtp_enable_starttls_auto'] = {{ gitlab_smtp_enable_starttls_auto | default('false') }}
-gitlab_rails['smtp_tls'] = {{ gitlab_smtp_tls | default('false') }}
-gitlab_rails['gitlab_email_from'] = "{{ gitlab_rails_gitlab_email_from | default('gitlab@') }}{{ gitlab_name_host }}"
-gitlab_rails['gitlab_email_reply_to'] = "{{ gitlab_rails_gitlab_email_reply_to | default('gitlab@')}}{{ gitlab_name_host }}"
+gitlab_rails['smtp_enable'] = {{ gitlab_smtp_enable }}
+{% if ( gitlab_smtp_enable is not defined or gitlab_smtp_enable=='true' ) %}
+gitlab_rails['smtp_address'] = "{{ gitlab_smtp_address }}"
+gitlab_rails['smtp_port'] = {{ gitlab_smtp_port }}
+gitlab_rails['smtp_user_name'] = "{{ gitlab_smtp_user_name }}"
+gitlab_rails['smtp_password'] = "{{ gitlab_smtp_password  }}"
+gitlab_rails['smtp_domain'] = "{{ gitlab_smtp_domain }}"
+gitlab_rails['smtp_authentication'] = "{{ gitlab_smtp_authentication  }}"
+gitlab_rails['smtp_enable_starttls_auto'] = {{ gitlab_smtp_enable_starttls_auto }}
+gitlab_rails['smtp_tls'] = {{ gitlab_smtp_tls }}
+gitlab_rails['smtp_openssl_verify_mode'] = '{{ gitlab_smtp_openssl_verify_mode }}'
+gitlab_rails['smtp_ca_path'] = '{{ gitlab_smtp_ca_path }}'
+gitlab_rails['smtp_ca_file'] = '{{ gitlab_smtp_ca_file }}'
 {% endif %}
 
 #########
 # Grafana
 #########
 grafana['enable'] = {{ grafana_enable | default('true') }}
-{% if ( grafana_enable is not defined or grafana_enable )  %}
+{% if ( grafana_enable is not defined or grafana_enable=='true' )  %}
 grafana['admin_password'] = '{{ grafana_admin_password | default('123456') }}'
 {% endif %}
 
@@ -109,7 +115,7 @@ grafana['admin_password'] = '{{ grafana_admin_password | default('123456') }}'
 # Mattermost config
 ###################
 mattermost['enable'] = {{ mattermost_enable | default('true') }}
-{% if  mattermost_enable is not defined or mattermost_enable  %}
+{% if  mattermost_enable is not defined or mattermost_enable=='true' %}
 mattermost_external_url "{{ gitlab_protocol_host }}{{ gitlab_subdomain_chat | default('chat') }}.{{ gitlab_name_host }}"
 mattermost['team_site_name'] = "{{ mattermost_team_site_name | default('Chat GitLab') }}"
 mattermost['env'] = {
@@ -130,13 +136,13 @@ mattermost['env'] = {
   'MM_EMAILSETTINGS_ENABLESIGNINWITHUSERNAME' => '{{ mattermost_env_MM_EMAILSETTINGS_ENABLESIGNINWITHUSERNAME | default('true') }}',
   'MM_EMAILSETTINGS_SENDEMAILNOTIFICATIONS' => '{{ mattermost_env_MM_EMAILSETTINGS_SENDEMAILNOTIFICATIONS | default('true') }}',
   'MM_EMAILSETTINGS_REQUIREEMAILVERIFICATION' => '{{ mattermost_env_MM_EMAILSETTINGS_REQUIREEMAILVERIFICATION | default('true') }}',
-  'MM_EMAILSETTINGS_SMTPUSERNAME' => '{{ gitlab_smtp_user_name | default('email@example.com') }}',
-  'MM_EMAILSETTINGS_SMTPPASSWORD' => '{{ gitlab_smtp_password | default('password') }}',
-  'MM_EMAILSETTINGS_SMTPSERVER' => '{{ gitlab_smtp_address | default('smtp.service.com') }}',
-  'MM_EMAILSETTINGS_SMTPPORT' => '{{ gitlab_smtp_port | default('465') }}',
-  'MM_EMAILSETTINGS_SMTPAUTH' => '{{ gitlab_smtp_authentication | default('password') }}',
+  'MM_EMAILSETTINGS_SMTPUSERNAME' => '{{ gitlab_smtp_user_name }}',
+  'MM_EMAILSETTINGS_SMTPPASSWORD' => '{{ gitlab_smtp_password }}',
+  'MM_EMAILSETTINGS_SMTPSERVER' => '{{ gitlab_smtp_address }}',
+  'MM_EMAILSETTINGS_SMTPPORT' => '{{ gitlab_smtp_port }}',
+  'MM_EMAILSETTINGS_SMTPAUTH' => '{{ gitlab_smtp_authentication }}',
   'MM_EMAILSETTINGS_FEEDBACKNAME' => '{{ mattermost_env_MM_EMAILSETTINGS_FEEDBACKNAME | default('Chat Gitlab') }}',
-  'MM_EMAILSETTINGS_FEEDBACKEMAIL' => '{{ gitlab_email_reply_to | default('gitlab@{{ gitlab_name_host }}') }}',
+  'MM_EMAILSETTINGS_FEEDBACKEMAIL' => '{{ gitlab_email_reply_to }}',
   'MM_EMAILSETTINGS_FEEDBACKORGANIZATION' => '{{ gitlab_subdomain_chat | default('chat') }}.{{ gitlab_name_host }}',
   'MM_EMAILSETTINGS_CONNECTIONSECURITY' => '{{ mattermost_env_MM_EMAILSETTINGS_CONNECTIONSECURITY | default('TLS') }}',
   'MM_EMAILSETTINGS_SENDPUSHNOTIFICATIONS' => '{{ mattermost_env_MM_EMAILSETTINGS_SENDPUSHNOTIFICATIONS | default('true') }}',
@@ -158,12 +164,9 @@ mattermost['env'] = {
 # Registry 
 ###########
 registry['enable'] = {{ registry_enable | default('true') }}
-{% if ( registry_enable is not defined or registry_enable) %}
+{% if ( registry_enable is not defined or registry_enable=='true') %}
 registry_external_url "{{ gitlab_protocol_host }}{{ gitlab_subdomain_registry | default('registry') }}.{{ gitlab_name_host }}/"
 gitlab_rails['registry_api_url'] = "{{ gitlab_protocol_host }}{{ gitlab_subdomain_registry | default('registry') }}.{{ gitlab_name_host }}/"
-
-# registry backup local or cloud 
-# cloud variables defaults empty
 {% if ( registry_storage_swift_username is defined and registry_storage_swift_password is defined and registry_storage_swift_authurl is defined ) %}
 registry['storagedriver_health_enabled'] = {{ registry_storagedriver_health_enabled | default('true') }}
 registry['storage'] = {
@@ -175,8 +178,6 @@ registry['storage'] = {
     'container' => '{{ registry_storage_swift_container }}',
   }
 }
-{% else %}
-gitlab_rails['registry_path'] = "{{ gitlab_rails_registry_path | default('/path/to/registry/storage') }}"
 {% endif %}
 {% endif %}
 
@@ -184,7 +185,7 @@ gitlab_rails['registry_path'] = "{{ gitlab_rails_registry_path | default('/path/
 # Omnibus GitLab Logs
 #####################
 logrotate['enable'] = {{ logrotate_enable | default('true') }}
-{% if ( logrotate_enable is not defined or logrotate_enable ) %}
+{% if ( logrotate_enable is not defined or logrotate_enable =='true') %}
 logging['logrotate_frequency'] = "{{ logging_logrotate_frequency | default('daily') }}"
 logging['logrotate_rotate'] = {{ logging_logrotate_rotate | default('30') }}
 logging['logrotate_compress'] = "{{ logging_logrotate_compress | default('compress') }}"
@@ -194,11 +195,24 @@ logging['logrotate_compress'] = "{{ logging_logrotate_compress | default('compre
 # Pages
 ########
 gitlab_pages['enable'] = {{ gitlab_pages_enable | default('true') }}
-{% if ( gitlab_pages_enable is not defined or gitlab_pages_enable ) %}
+{% if ( gitlab_pages_enable is not defined or gitlab_pages_enable =='true') %}
 pages_external_url "http://{{ gitlab_subdomain_pages | default('pages') }}.{{ gitlab_name_host }}/"
 gitlab_pages['access_control'] = {{ gitlab_pages_access_control | default('true') }}
 gitlab_pages['log_verbose'] = {{ gitlab_pages_log_verbose | default('true') }}
 {% endif %}
 
-
+######
+# LDAP
+######
+gitlab_rails['ldap_enabled'] = {{ gitlab_ldap_enabled }}
+{% if ( gitlab_ldap_enabled is not defined or gitlab_ldap_enabled =='true') %}
+gitlab_rails['ldap_host'] = '{{ gitlab_ldap_host }}'
+gitlab_rails['ldap_port'] = {{ gitlab_ldap_port }}
+gitlab_rails['ldap_uid'] = '{{ gitlab_ldap_uid }}'
+gitlab_rails['ldap_method'] = '{{ gitlab_ldap_method}}'
+gitlab_rails['ldap_bind_dn'] = '{{ gitlab_ldap_bind_dn }}'
+gitlab_rails['ldap_password'] = '{{ gitlab_ldap_password }}'
+gitlab_rails['ldap_allow_username_or_email_login'] = true
+gitlab_rails['ldap_base'] = '{{ gitlab_ldap_base }}'
+{% endif %}
 
