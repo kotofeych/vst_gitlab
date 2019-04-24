@@ -4,7 +4,7 @@ dependencies:
   - role: geerlingguy.gitlab
     vars:
       gitlab_config_template: "{{ vst_gitlab_config_template | default('gitlab-vst.rb.j2') }}"
-      gitlab_protocol_host: '{{ "https://" if (letsencrypt_enable is not defined or letsencrypt_enable=="true") else "http://" }}'
+      gitlab_protocol_host: '{{ "https://" if (letsencrypt_enable is not defined or letsencrypt_enable=="true" or letsencrypt_enable==True) else "http://" }}'
       gitlab_name_host: "{{ vst_gitlab_name_host | default('mydomen.ru') }}"
       gitlab_create_self_signed_cert: "false"
 
@@ -26,4 +26,3 @@ galaxy_info:
     - repository
     - ci
     - integration
-
