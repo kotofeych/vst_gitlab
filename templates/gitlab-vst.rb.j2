@@ -10,12 +10,12 @@ git_data_dirs({"default" => {"path" => "{{ gitlab_git_data_dir }}"} })
 ###################
 # PROJECTS FEATURES
 ###################
-gitlab_rails['gitlab_default_projects_features_issues'] = {{ gitlab_rails_gitlab_default_projects_features_issues | default('true') | lower  }}
-gitlab_rails['gitlab_default_projects_features_merge_requests'] = {{ gitlab_rails_gitlab_default_projects_features_merge_requests | default('true') | lower   }}
-gitlab_rails['gitlab_default_projects_features_wiki'] = {{ gitlab_rails_gitlab_default_projects_features_wiki | default('true') | lower   }}
-gitlab_rails['gitlab_default_projects_features_snippets'] = {{ gitlab_rails_gitlab_default_projects_features_snippets | default('true') | lower   }}
-gitlab_rails['gitlab_default_projects_features_builds'] = {{ gitlab_rails_gitlab_default_projects_features_builds | default('true') | lower   }}
-gitlab_rails['gitlab_default_projects_features_container_registry'] = {{ gitlab_rails_gitlab_default_projects_features_container_registry | default('true') | lower   }}
+gitlab_rails['gitlab_default_projects_features_issues'] = {{ gitlab_rails_gitlab_default_projects_features_issues | default('true') | lower }}
+gitlab_rails['gitlab_default_projects_features_merge_requests'] = {{ gitlab_rails_gitlab_default_projects_features_merge_requests | default('true') | lower }}
+gitlab_rails['gitlab_default_projects_features_wiki'] = {{ gitlab_rails_gitlab_default_projects_features_wiki | default('true') | lower }}
+gitlab_rails['gitlab_default_projects_features_snippets'] = {{ gitlab_rails_gitlab_default_projects_features_snippets | default('true') | lower }}
+gitlab_rails['gitlab_default_projects_features_builds'] = {{ gitlab_rails_gitlab_default_projects_features_builds | default('true') | lower }}
+gitlab_rails['gitlab_default_projects_features_container_registry'] = {{ gitlab_rails_gitlab_default_projects_features_container_registry | default('true') | lower }}
 gitlab_rails['gitlab_issue_closing_pattern'] = "{{ gitlab_rails_gitlab_issue_closing_pattern | default('((?:[Cc]los(?:e[sd]?|ing)|[Ff]ix(?:e[sd]|ing)?|[Rr]esolv(?:e[sd]?|ing)|[Ii]mplement(?:s|ed|ing)?)(:?) +(?:(?:issues? +)?%{issue_ref}(?:(?:, *| +and +)?)|([A-Z][A-Z0-9_]+-\\d+))+)') }}"
 
 ###########
@@ -57,7 +57,7 @@ letsencrypt['enable'] = {{ letsencrypt_enable  | default ('true') | lower }}
 {% if (letsencrypt_contact_email is defined and letsencrypt_contact_email) %}
 letsencrypt['contact_emails'] = ['{{ letsencrypt_contact_email }}'] 
 {% endif %}
-letsencrypt['auto_renew'] = {{ letsencrypt_auto_renew | default('true') | lower  }}
+letsencrypt['auto_renew'] = {{ letsencrypt_auto_renew | default('true') | lower }}
 {% endif %}
 
 ################
@@ -73,7 +73,8 @@ gitlab_rails['backup_upload_connection'] = {
     }
 {% endif %}
 gitlab_rails['backup_archive_permissions'] = {{ gitlab_rails_backup_archive_permissions | default('0644') }}
-gitlab_rails['backup_upload_remote_directory'] = '{{ gitlab_rails_backup_upload_remote_directory | default('gitlab-backups') }}'
+# Uploading to locally mounted shares - !!!--- DELETE !? ---!!!
+# gitlab_rails['backup_upload_remote_directory'] = '{{ gitlab_rails_backup_upload_remote_directory | default('gitlab-backups') }}'
 gitlab_rails['backup_storage_class'] = '{{ gitlab_rails_backup_storage_class | default('STANDARD') }}'
 gitlab_rails['backup_keep_time'] = {{ gitlab_backup_keep_time }}
 
