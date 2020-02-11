@@ -73,8 +73,7 @@ gitlab_rails['backup_upload_connection'] = {
     }
 {% endif %}
 gitlab_rails['backup_archive_permissions'] = {{ gitlab_rails_backup_archive_permissions | default('0644') }}
-# Uploading to locally mounted shares - !!!--- DELETE !? ---!!!
-# gitlab_rails['backup_upload_remote_directory'] = '{{ gitlab_rails_backup_upload_remote_directory | default('gitlab-backups') }}'
+gitlab_rails['backup_upload_remote_directory'] = '{{ gitlab_rails_backup_upload_remote_directory | default('gitlab-backups') }}'
 gitlab_rails['backup_storage_class'] = '{{ gitlab_rails_backup_storage_class | default('STANDARD') }}'
 gitlab_rails['backup_keep_time'] = {{ gitlab_backup_keep_time }}
 
